@@ -1,0 +1,11 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        maven { url 'https://repo.spring.io/release' }
+    }
+}
+
+rootProject.name = 'my-multiservice'
+
+include 'api-gateway', 'config-server', 'eureka-server', 'notification-for-userservice', 'user-service-spring'
