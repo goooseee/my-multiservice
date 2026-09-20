@@ -1,0 +1,47 @@
+server:
+  port: 8080
+
+spring:
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: user-service
+              uri: lb://USER-SERVICE-SPRING
+              predicates:
+                - Path=/api/v1/users, /api/v1/users/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    id: userServiceCircuitBreaker            
+                    fallbackUri: forward:/fallback/users
+
+            - id: notification-service
+              uri: lb://NOTIFICATION-FOR-USERSERVICE
+              predicates:
+                - Path=/api/v1/notifications, /api/v1/notifications/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    id: notificationServiceCircuitBreaker  
+                    fallbackUri: forward:/fallback/notifications
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      userServiceCircuitBreaker:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000ms
+      notificationServiceCircuitBreaker:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000ms
+
+  timelimiter:
+    instances:
+      userServiceCircuitBreaker:
+        timeoutDuration: 3s
+      notificationServiceCircuitBreaker:
+        timeoutDuration: 3s
