@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: notification-for-userservice
+  config:
+    import: "optional:configserver:http://config-server:8888"
