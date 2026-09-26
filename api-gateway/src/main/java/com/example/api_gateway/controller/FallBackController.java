@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/fallback")
 public class FallBackController {
 	
-	@GetMapping("/users")
+	@RequestMapping("/users")
     public ResponseEntity<Map<String, String>> userServiceFallback() {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                 .body(Map.of(
@@ -24,7 +24,7 @@ public class FallBackController {
                 ));
     }
 	
-	@GetMapping("/notifications")
+	@RequestMapping("/notifications")
     public ResponseEntity<Map<String, String>> notificationServiceFallback() {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                 .body(Map.of(
