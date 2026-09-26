@@ -1,0 +1,49 @@
+spring:
+  cloud:
+    config:
+      enabled: false
+    discovery:
+      enabled: false
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: user-service-route
+              uri: http://localhost:${wiremock.server.port:8089}
+              predicates:
+                - Path=/api/v1/users/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    id: userCircuitBreaker
+                    fallbackUri: forward:/fallback/users
+                    statusCodes:
+                      - 500
+
+            - id: notification-service-route
+              uri: http://localhost:${wiremock.server.port:8089}
+              predicates:
+                - Path=/api/v1/notifications/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    id: notificationCircuitBreaker
+                    fallbackUri: forward:/fallback/notifications
+                    statusCodes:
+                      - 500
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      userCircuitBreaker:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+      notificationCircuitBreaker:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+  timelimiter:
+    instances:
+      userCircuitBreaker:
+        timeoutDuration: 1s
+      notificationCircuitBreaker:
+        timeoutDuration: 1s
